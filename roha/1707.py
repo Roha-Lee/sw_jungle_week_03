@@ -1,11 +1,12 @@
 import sys 
-from collections import defaultdict, Counter
+from collections import defaultdict
 
 class DisjointSet:
     def __init__(self, max_val):
         self.parent = {i:i for i in range(1, max_val+1)} 
         self.rank = {i:0 for i in range(1, max_val+1)}
-    
+        self.cc = max_val
+
     def find(self, x):
         if self.parent[x] != x:
             self.parent[x] = self.find(self.parent[x])
@@ -24,15 +25,14 @@ class DisjointSet:
             else:
                 self.parent[y] = x
                 self.rank[y] = self.rank[x]
+            self.cc -= 1
 
+    def get_component_nums(self):
+        isolated = sum([val == 0 for val in self.rank.values()])
+        return self.cc, isolated
 
-def get_component_from_ds(ds):
-    cntr = Counter(ds.parent.values())
-    count = sum([value > 1 for value in cntr.values()])
-    return count
         
-        
-def is_bipartite_graph(graph, v, graph_components):
+def is_bipartite_graph(graph, v, start, isolated):
     ds = DisjointSet(v)
     for node in graph:
         neighbors = graph[node]
@@ -41,9 +41,13 @@ def is_bipartite_graph(graph, v, graph_components):
             for second in neighbors:
                 ds.union(first, second)
     
-    calc_components = get_component_from_ds(ds)
-    print(calc_components, graph_components)
-    # if cl
+    end, _ = ds.get_component_nums()
+    const = (end - isolated) / (start - isolated)
+    
+    if const == float(2):
+        return "YES"
+    else:
+        return "NO"
 
 if __name__ == '__main__':
     input = sys.stdin.readline
@@ -57,6 +61,6 @@ if __name__ == '__main__':
             graph[src].append(dst)
             graph[dst].append(src)
             ds.union(src, dst)
-        components = get_component_from_ds(ds)
-        print(is_bipartite_graph(graph, v, components))
+        start, isolated = ds.get_component_nums()
+        print(is_bipartite_graph(graph, v, start, isolated))
 
