@@ -32,17 +32,16 @@ setrecursionlimit(10**9)
 
 def DFS_1(start, res):
     for child in edge[start]:
-        if visited[child] == 0 and  A[child] == 1:
+        if A[child] == 1:
             res += 1
     return res
 
 def DFS_2(start, res):
     for child in edge[start]:
-        if visited[child] == 0 and A[child]!= 1:
-            visited[child] = 1
-            res = DFS_2(child, res)
+        if A[child] == 0:
             A[child] = 2
-        elif visited[child] == 0 and  A[child] == 1:
+            res = DFS_2(child, res)
+        elif A[child] == 1:
             res += 1
     return res
 
@@ -67,13 +66,11 @@ for start in edge:
     res2 = 0
     if A[start] == 0:    
         #경로 탐색시 방문 확인 - visited
-        visited = [0] * (N+1)
-        visited[start] = 1
         A[start] = 2
         res2 = DFS_2(start, res2)
         total = total + res2*(res2-1)
 
-print(edge, A)
+# print(edge, A)
 
 #2. 실내 - 실내 경로 개수 세기
 #위의 반복문 끝나고 나면 실내는 전부 1이되고 실외는 2가됨 - 1 실내에서 출발해서 바로 1로 끝나는 애들만 세주면 됨
@@ -83,22 +80,7 @@ for start in edge:
     res2 = 0
     if A[start] == 1:    
         #경로 탐색시 방문 확인 - visited
-        visited = [0] * (N+1)
-        visited[start] = 1
         res2 = DFS_1(start, res2)
         total = total + res2
 
 print(total)
-
-
-#실내에서 부터 세는 방식
-# res = 0
-# for start in edge:
-#     # 시작점이 실내이면 dfs 시작.
-#     if A[start] == 1:    
-#         #경로 탐색시 방문 확인 - visited
-#         visited = [0] * (N+1)
-#         visited[start] = 1
-#         res = DFS_1(start, res)
-
-# print(res)
