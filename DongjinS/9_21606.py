@@ -28,12 +28,20 @@ i번째 문자 A_i가 1일 경우 i번 장소는 실내이며, 0 경우 $i$번 �
 '''
 from sys import stdin, setrecursionlimit
 from collections import defaultdict
+setrecursionlimit(10**9)
 
-def DFS(start, res):
+def DFS_1(start, res):
+    for child in edge[start]:
+        if visited[child] == 0 and  A[child] == 1:
+            res += 1
+    return res
+
+def DFS_2(start, res):
     for child in edge[start]:
         if visited[child] == 0 and A[child]!= 1:
             visited[child] = 1
-            res = DFS(child, res)
+            res = DFS_2(child, res)
+            A[child] = 2
         elif visited[child] == 0 and  A[child] == 1:
             res += 1
     return res
@@ -50,15 +58,47 @@ for _ in range(N-1):
     edge[u].append(v)
     edge[v].append(u)
 
-print(N, A, edge)
-
-res = 0
+#실외에서 부터 세는 방식
+#1. 실외에서 이어지는 실내 개수 세기 
+total = 0
 for start in edge:
-    # 시작점이 실내이면 dfs 시작.
+    # 시작점이 실외면 dfs 시작.
+    #res2 - 실외와 연결된 실내의 개수.
+    res2 = 0
+    if A[start] == 0:    
+        #경로 탐색시 방문 확인 - visited
+        visited = [0] * (N+1)
+        visited[start] = 1
+        A[start] = 2
+        res2 = DFS_2(start, res2)
+        total = total + res2*(res2-1)
+
+print(edge, A)
+
+#2. 실내 - 실내 경로 개수 세기
+#위의 반복문 끝나고 나면 실내는 전부 1이되고 실외는 2가됨 - 1 실내에서 출발해서 바로 1로 끝나는 애들만 세주면 됨
+for start in edge:
+    # 시작점이 실외면 dfs 시작.
+    #res2 - 실외와 연결된 실내의 개수.
+    res2 = 0
     if A[start] == 1:    
         #경로 탐색시 방문 확인 - visited
         visited = [0] * (N+1)
         visited[start] = 1
-        res = DFS(start, res)
+        res2 = DFS_1(start, res2)
+        total = total + res2
 
-print(res)
+print(total)
+
+
+#실내에서 부터 세는 방식
+# res = 0
+# for start in edge:
+#     # 시작점이 실내이면 dfs 시작.
+#     if A[start] == 1:    
+#         #경로 탐색시 방문 확인 - visited
+#         visited = [0] * (N+1)
+#         visited[start] = 1
+#         res = DFS_1(start, res)
+
+# print(res)
