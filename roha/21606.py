@@ -2,8 +2,6 @@ import sys
 from collections import defaultdict
 
 def dfs(graph, node, inout, count=0):
-    if inout[node] == 2:
-        return count 
     if inout[node] == 1:
         return count + 1 
     
