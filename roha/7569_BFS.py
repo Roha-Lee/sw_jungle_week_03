@@ -12,7 +12,6 @@ def get_max_days(results, heights, rows, cols):
                     max_days = max(max_days, results[h][r][c])
     return max_days - 1
 
-
 def find_ripe_tomatos(tomatos, heights, rows, cols, visited):
     q = deque()
     for h in range(heights):
