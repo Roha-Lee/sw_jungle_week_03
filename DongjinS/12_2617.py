@@ -14,6 +14,7 @@
 구슬 4번이 구슬 3번보다 무겁다.
 구슬 5번이 구슬 1번보다 무겁다.
 구슬 4번이 구슬 2번보다 무겁다.
+
 위와 같이 네 개의 결과만을 알고 있으면, 무게가 중간인 구슬을 정확하게 찾을 수는 없지만,
 1번 구슬과 4번 구슬은 무게가 중간인 구슬이 절대 될 수 없다는 것은 확실히 알 수 있다.
 1번 구슬보다 무거운 것이 2, 4, 5번 구슬이고, 4번 보다 가벼운 것이 1, 2, 3번이다. 따라서 답은 2개이다.
@@ -27,3 +28,42 @@ M 개의 쌍에 대한 결과를 보고 무게가 중간인 구슬이 될 수 �
 출력
 첫 줄에 무게가 중간이 절대로 될 수 없는 구슬의 수를 출력 한다.
 '''
+## 주의할 점! 방문했던 노드 다시 방문하지 않도록 확인해야함. 확인하지 않아서 처음에 계속 틀리게 나왔음
+from sys import stdin, setrecursionlimit
+from collections import defaultdict
+setrecursionlimit(10**9)
+
+def DFS(edge ,node, cnt, visited):
+    if cnt >= (N+1)//2:
+        return cnt
+    if node in edge:
+        for child in edge[node]:
+            if visited[child] != True:
+                visited[child] = True
+                cnt = DFS(edge,child,cnt+1, visited)
+    return cnt
+
+N, M = [int(x) for x in stdin.readline().split()]
+
+bigger_edge = defaultdict(list)
+smaller_edge = defaultdict(list)
+for _ in range(M):
+    u, v = [int(x) for x in stdin.readline().split()]
+    bigger_edge[v].append(u)
+    smaller_edge[u].append(v)
+
+ans = []
+for node in bigger_edge:
+    visited = [False]*(N+1)
+    visited[node] = True
+    if DFS(bigger_edge,node, 0, visited) >= (N+1)//2:
+        ans.append(node)
+
+for node in smaller_edge:
+    visited = [False]*(N+1)
+    visited[node] = True
+    if DFS(smaller_edge, node, 0, visited) >= (N+1)//2:
+        ans.append(node)
+
+ans = list(set(ans))
+print(len(ans))
