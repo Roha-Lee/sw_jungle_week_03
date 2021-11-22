@@ -11,7 +11,6 @@ def melt_down_1_year(worlds):
                 _melt(worlds, r, c, visited)
     return count
     
-
 def _melt(worlds, r, c, visited):
     moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     rows = len(worlds)
