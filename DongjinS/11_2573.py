@@ -1,6 +1,6 @@
 # 11	2573	상	DFS	빙산
 ###해결!! 방법 -
-##1. line23 if ice_mountain[i][j] != 0 and visited[i][j]!=1: --> if visited[i][j]!=1 and ice_mountain[i][j] != 0:
+##1. line23  if visited[i][j]!=1 and ice_mountain[i][j] != 0: --> if ice_mountain[i][j] != 0 and visited[i][j]!=1:
 ##2. 참조할 변수들 다 파라미터로 넘겨줘서 전역변수 참조 안하고 지역변수 참조 하도록 바꿔줌!
 from sys import stdin, setrecursionlimit
 setrecursionlimit(10**8)
