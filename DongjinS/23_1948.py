@@ -35,16 +35,18 @@ M = int(stdin.readline())
 world_map = defaultdict(list)
 back_world_map = defaultdict(list)
 
+#정방향으로의 그래프 관계 - world_map, 과 역방향으로의 그래프 관계 - back_world_map을 만든다.
 for _ in range(M):
     u,v,d = [int(x) for x in stdin.readline().split()]
     world_map[u].append((v, d))
     back_world_map[v].append((u,d))
-# print(f'world_map: {world_map}')
-# print(f'back_world_map: {back_world_map}')
+
+#출발점과 목적지를 입력
 start, end = [int(x) for x in stdin.readline().split()]
 
 indegree = {i:0 for i in range(1,N+1)}
 
+#정방향 그래프에서의 각 정점별 진입차수를 만든다. indegree
 for departure in world_map:
     for arrival, dist in world_map[departure]:
         indegree[arrival] += 1
@@ -58,12 +60,13 @@ city_maxdist = {i:0 for i in range(1,N+1)}
 while q:
     now_dist, now_city = q.popleft()
     for next_city, next_dist in world_map[now_city]:
+        #현재 지점까지의 거리(최대거리)와 이동할 거리를 더한 것과 이동할 지점의 현재 최대 거리를 비교해서 이동할 지점까지의 최대 거리를 최신화
         city_maxdist[next_city] = max(city_maxdist[next_city], now_dist + next_dist)
+        #진입 차수가 0이 된 것들은 큐에 넣는다 = 정점(next_city)까지의 최대거리가 확정된 것들 - 더 이상 최신화할 진입이 없는 것들.
         indegree[next_city] -= 1
         if indegree[next_city] == 0:
             q.append((city_maxdist[next_city], next_city))
 
-# print(city_maxdist)
 ans_dist = city_maxdist[end]
 print(ans_dist)
 
@@ -74,9 +77,11 @@ while q:
     now_dist, now_city = q.popleft()
     for next_city, next_dist in back_world_map[now_city]:
         if (now_city, next_city) not in visited:
+            #현재까지의 최대거리(now_dist)에서 이동할 지점까지의 거리를 뺀 게 이동할 지점의 최대거리인지 확인 - 목적지의 최대치를 도달하는 경로인지 확인
             if city_maxdist[next_city] == now_dist - next_dist:
+                #확인된 경로의 (정정의 최대거리와 정점)을 큐에 넣고, 방문한 경로에도 (현재 정점, 확인된 이동한 정점)넣어서 같은 경로를 다시 반복하지 않게 한다
                 q.append((city_maxdist[next_city], next_city))
                 visited.add((now_city, next_city))
 
-# print(visited)
+#확인된 경로의 숫자 = 목적지까지 최대거리로 도달할 수 있는 경로의 숫자
 print(len(visited))

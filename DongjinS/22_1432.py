@@ -21,27 +21,28 @@ N개의 정점이 있는 그래프가 주어지면, 다음과 같은 방법에 �
 만약 그래프의 번호를 수정할 수 없다면 -1을 출력한다.
 답이 여러 개일 경우에는 사전 순으로 제일 앞서는 것을 출력한다.
 '''
+# 문제: 그래프의 순서를 다시 정하고 바뀐 순서에서 원래 순서의 인덱스를 출력하라.
+## 문제 정의 부터 너무 힘든 문제..
 ## 그래프를 정방향으로 해서 위상정렬할 시 같은 차수의 두개의 정점을 골라야 할때 아웃워드 차수가 높고 정점의 숫자가 낮은 것을 골라야한다.
 # 이런 조건 속에서 위상정렬을 수행하기 어렵기 때문에 역방향으로 그래프를 바꾸어 조건 또한 반대로 같은 차수의 두개의 정점을 골라야 할때 인워드 차수가 낮고 정점의 숫자가 높은 것을 고르면된다.
 # 이러한 조건은 정상적인 위상정렬을 통해 인워드차수가 낮은걸 큐에 넣어 구해주면 되고 우선순위 큐를 통해 정점의 숫자가 높은 것(- 붙이기)을 고르면 된다.
 # 그렇게 역으로 만든 그래프를 통해 위상정렬을 하여 나온 결과를 다시 리버스하고 zip 함수를 통해 인덱스를 붙여준다.
 # 이것을 다시 결과 순으로 정렬하면 결과는 정렬되고 인덱스는 결과를 따라 바뀌게 된다. 이때의 인덱스 값이 답이다.
 from sys import stdin
-from collections import deque, defaultdict
+from collections import defaultdict
 from heapq import heappush, heappop
+
 def topology(N, connected_info):
-    #진입 차수 구하기(원본의 아웃워드 디그리)    
+    #그래프의 진입 차수 구하기(원본의 아웃워드 디그리)    
     indegree = {i:0 for i in range(1,N+1)}
     for key in connected_info:
         for i in connected_info[key]:
             indegree[i] += 1
-    # print(indegree)
     #indegree 0 이면 우선순위큐에 넣기
     hq = []
     for i in indegree:
         if indegree[i] == 0:
             heappush(hq,-i)
-    # print(hq)
     #위상정렬 진행
     res = []
     while hq:
@@ -51,21 +52,21 @@ def topology(N, connected_info):
             indegree[next] -= 1
             if indegree[next] == 0:
                 heappush(hq,-next)
-    # print(res)
     if len(res) == N:
         #위상정렬된 것들 뒤집고 원래 인덱스 구하기
         res.reverse()
-        # print(res)
-        # print(sorted(list(zip(res, range(1,N+1)))))
-        # print(*sorted(list(zip(res, range(1,N+1)))))
         res, index = (zip(*sorted(list(zip(res, range(1,N+1))))))
         print(*index)
         return
     else:
         print(-1)
         return
+
+# N 정점의 개수 입력
 N = int(stdin.readline())
+# connected_info - 현재 그래프의 관계 입력 (역으로 저장)
 connected_info = defaultdict(list)
+#수정하지 않아도 되는 그래프, '만약 V1에서 V2로 연결된 간선이 있다면, V2의 번호는 V1보다 커야 한다.' 를 이미 만족하는 그래프 확인하는 플래그
 flag_2_topology = 0
 for i in range(N):
     tmp = list(map(int,stdin.readline().strip()))
@@ -74,9 +75,11 @@ for i in range(N):
             connected_info[j+1].append(i+1)
             if j<i:
                 flag_2_topology = 1
-# print(connected_info)
+
+#수정하지 읺아도 되는 그래프는 정점의 순서대로 바로 출력 
 if flag_2_topology == 0:
     print("위상정렬 안해도됨")
     print(*[i for i in range(1,N+1)])
+#그래프 수정 시작 - 위상정렬
 else:
     topology(N, connected_info)

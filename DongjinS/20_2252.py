@@ -23,32 +23,33 @@ N명의 학생들을 키 순서대로 줄을 세우려고 한다.
 # 정점의 개수만큼 팝이 되어야 하기 때문에 정점의 개수만큼 반복하고 그 전에 큐가 비게 되면 그래프안에 사이클이 있는것으로 위상정렬을 할 수 없는 그래프 이다.
 from sys import stdin
 from collections import deque, defaultdict
+#학생의 수 - N, 카 비교 횟수 - M
 N, M = [int(x) for x in stdin.readline().split()]
-
+# 키 비교 관계 그래프 - height_compare, 자신의 앞에 서야하는 학생의 수 - indegree = 진입차수
 indegree = [0] * (N+1)
 height_compare = defaultdict(list)
-
 for _ in range(M):
     u,v = [int(x) for x in stdin.readline().split()]
     indegree[v] += 1
     height_compare[u].append(v)
-
-
+#위상정렬의 결과 - res
 res = []
+# 위상정렬 시작
+# 진입차수가 0인 것들 q에 넣어준다.
 q = deque()
 for i in range(1,len(indegree)):
     if indegree[i] == 0:
         q.append(i)
-
 for _ in range(N):
+    #N만큼 반복하기 전에 큐가 끝나면 싸이클이 있다는 것.
     if not q:
-        print('cycle, cannor topology')
+        print('cycle, cannot topology')
     x = q.popleft()
+    #큐에서 먼저 나온게 위상정렬 순서
     res.append(x)
     for node in height_compare[x]:
         indegree[node]-=1
         if indegree[node] == 0:
             q.append(node)
 
-    
 print(*res, sep=" ")

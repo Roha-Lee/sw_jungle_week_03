@@ -15,14 +15,14 @@ def MeltingIce(x, y, visited, ice_mountain, N, M):
                 ice_mountain[x][y] = max(0, ice_mountain[x][y]-1)       
             elif ice_mountain[nx][ny] > 0:
                 MeltingIce(nx, ny, visited, ice_mountain, N, M)      
-def countIce(N, M, ice_mountain):    
+def countIce(N, M, ice_mountain):
     year = 0
     while True:
         cnt = 0
         visited = [[0 for col in range(M)] for row in range(N)]
         for i in range(1,N-1):
             for j in range(1,M-1):
-                if visited[i][j]!=1 and ice_mountain[i][j] != 0:
+                if ice_mountain[i][j]!= 0 and visited[i][j]!=1:
                     cnt +=1
                     MeltingIce(i, j, visited, ice_mountain, N, M)
         if cnt>=2:

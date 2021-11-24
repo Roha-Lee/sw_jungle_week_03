@@ -27,41 +27,48 @@
 ## https://velog.io/@qweadzs/BOJ-2637-%EC%9E%A5%EB%82%9C%EA%B0%90-%EC%A1%B0%EB%A6%BDPython
 from sys import stdin
 from collections import defaultdict, deque
-
+#부품의 개수 - N
 N = int(stdin.readline())
+# 중간 혹은 완제품을 완성하는데 필요한 부품의 관계 수  - M 
 M = int(stdin.readline())
-
+# 중간 혹은 완제품을 완성하는데 필요한 부품의 관계 - requirement_info
 requirement_info = defaultdict(list)
+# 부품을 만드는데 필요한 부분 부품의 단순 개수를 저장 = 진입차수 - indegree
+# -> (5:2, 6:3, 7:3)
 indegree = [0] * (N+1)
+# 중간 혹은 완제품을 만드는데 필요한 '기본' 부품들의 개수를 저장 - part_cnt
+# -> (5:[2,2,0,0,0,0,0], 6:[2*2,2*2,3,4,0,0,0], 7:[2*2+(2*2)*3, 2*2+(2*2)*3, 3*3, 5+4*3, 0, 0, 0])
 part_cnt = [[0]* (N+1) for _ in range(N+1)]
 for _ in range(M):
     u,v,c = [int(x) for x in stdin.readline().split()]
     requirement_info[v].append((u,c))
     indegree[u] += 1
-
-# print(requirement_info)
+# indegree 0인 부품들을 큐에 넣는다 - 1,2,3,4
 q = deque()
 for i in range(1,len(indegree)):
     if indegree[i] == 0:
         q.append(i)
-
-
-#직전 문제에서는 n번 반복하는게 중요하다고 했는데, 사이클이 있는지 파악하기 위해서,, 여기서는 신경쓸 필요가 없나?
+## 직전 문제에서는 n번 반복(사이클이 있는지 파악) 여기서는 중요하지 않은 이유.
+# - 만들기 위해 1번 부품을 필요로하는 N번 부품이 1번 부품을 만들기위해 필요로 되지 않는다면 사이클 없는 것.
 while q:
     now = q.popleft()
+    # now를 필요로 하는 'node'와 node 가 now를 필요로 하는 개수 'need'
     for node, need in requirement_info[now]:
-        #필요부품이 없으면 - 기본부품
+        # now가 기본 부품이면 (part count 의 now 행의 모든 열이 0이면 기본부품) node의 해당하는 part_cnt의 행열(part[node][now])에 now를 필요로 하는 만큼만(need) 더해준다
+        # 시작을 기본 부품으로 하기 때문에 처음 큐에 들어온 기본 부품들을 큐에서 빼면서 part_cnt 의 중간+완제품 행에는 0이 아닌 것들이 생기게 된다.
         if part_cnt[now].count(0) == N+1:
             part_cnt[node][now] += need
-        #중간 부품
+        # now가 중간 부품이면 node의 해당하는 part_cnt의 행에 now에 해당하는 part_cnt의 모든 열을 필요한(need) 만큼 곱해서 더해준다.
         else:
             for i in range(1,len(part_cnt)):
                 part_cnt[node][i] += part_cnt[now][i] * need
-        #차수 빼기
+        # node가 필요로 하는 now의 부품을 채워주었기 때문에 node의 진입차수를 -1 해준다. 
         indegree[node]-=1
+        # node의 진입 차수가 0이 되면(=필요한 부품이 모두 채워졌으면) 큐에 node를 넣어준다.
         if indegree[node] == 0:
-            q.append(node)
 
+            q.append(node)
+# N = 완제품 = 마지막 제품 번호 의 part_cnt 행의 0을 제외한(기본 부품들의) 모든 값을 한개씩 출력해준다.
 for i in range(1,len(part_cnt[N])):
     if part_cnt[N][i]:
         print(i, part_cnt[N][i])
